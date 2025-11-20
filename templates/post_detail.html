@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ post.title }}{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Post Card -->
+      <article class="card shadow-sm border-0 p-4 mb-5">
+        {% if post.image %}
+          <img src="{{ post.image.url }}" class="card-img-top rounded mb-4" alt="{{ post.title }}">
+        {% endif %}
+
+        <h1 class="fw-bold mb-3">{{ post.title }}</h1>
+        <p class="text-muted mb-4">
+          By <strong>{{ post.author }}</strong> • {{ post.date|date:"F j, Y" }}
+        </p>
+        <div class="card-text fs-5" style="line-height: 1.8;">
+          {{ post.body|linebreaks }}
+        </div>
+
+        <!-- Back button -->
+        <div class="mt-5">
+          <a href="{% url 'post_list' %}" class="btn btn-outline-primary">
+            ← Back to All Posts
+          </a>
+        </div>
+      </article>
+
+      <!-- Comments Section -->
+      <section id="comments" class="mb-5">
+        <div class="card shadow-sm border-0 p-4">
+          <h3 class="fw-bold mb-4">
+            <i class="bi bi-chat-dots text-primary me-2"></i> Comments ({{ post.comment_set.count }})
+          </h3>
+
+          {% if post.comment_set.exists %}
+            {% for comment in post.comment_set.all %}
+              <div class="card shadow-sm border-0 mb-3 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-4 me-2 text-primary"></i>
+                    <strong>{{ comment.author }}</strong>
+                  </div>
+                  <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                <p class="mb-0">{{ comment.comment }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-1"></i> No comments yet. Be the first to comment!
+            </div>
+          {% endif %}
+
+          <!-- Comment Form -->
+          {% if user.is_authenticated %}
+            <div class="card shadow-sm border-0 p-4 mt-4">
+              <h5 class="fw-bold mb-3">
+                <i class="bi bi-pencil-square text-primary me-2"></i> Add a Comment
+              </h5>
+              <form method="post" class="mt-3">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-2">
+                  <i class="bi bi-send me-1"></i> Submit
+                </button>
+              </form>
+            </div>
+          {% else %}
+            <p class="mt-4">
+              <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to comment</a>
+            </p>
+          {% endif %}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}

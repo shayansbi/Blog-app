@@ -12,6 +12,7 @@ class CustomUserAdmin(UserAdmin):
         'email',
         'username',
         'is_staff',
+        'avatar'
     ]
     fieldsets = (
     (None, {"fields": ("username", "password")}),
